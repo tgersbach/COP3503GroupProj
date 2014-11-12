@@ -1,23 +1,42 @@
 #include "Board.h"
 
-Board::Board(int boardSize)
+Board::Board(int winSize)
 {
 	//Setting the cursor to the default position in the board
 	this->cursor[0] = 0; 
 	this->cursor[1] = 0; 
 
 	//Setting each piece on the board to a default piece 
-	for(int x = 0; x < this->boardSize; x++)
+	for (int x = 0; x < boardSize; x++)
 	{
-		for(int y = 0; y < this->boardSize; y++)
-		{this->board[x][y] = Piece(); }
+		for (int y = 0; y < boardSize; y++)
+      { board[x][y] = new Piece(); }
 	}
+  
+  win = false;
+  this->winSize = winSize;
+  winCount = 0;
+  sectorSize = boardSize - winSize;
+  numDiags = 2*sectorSize - 1;
+  
+  lsf_row = boardSize - (numDiags - sectorSize);
+  lsf_col = 0;
+  mf_row = boardSize - 1;
+  mf_col = 0;
+  rsf_row = boardSize - 1;
+  rsf_col = 1;
+  lsb_row = boardSize - winSize;
+  lsb_col = 0;
+  mb_row = mb_col = 0;
+  rsb_row = 0;
+  rsb_col = 1;
+  lsf_count = rsf_count = lsb_count = lsb_count = 0;
 
-	//The piece (zero, zero) on the board is the cursor
-	this->board[cursor[0]][cursor[1]].changeCursor(true); 
+	// The piece (zero, zero) on the board is the cursor
+	board[cursor[0]][cursor[1]].changeCursor(true);
 
-	//What the representation of the cursor is (to be used for later)
-	this->cursorChar = '*'; 
+	// What the representation of the cursor is (to be used for later)
+	cursorChar = '*';
 }
 
 void Board::change(int row, int column, int player)
@@ -26,20 +45,172 @@ void Board::change(int row, int column, int player)
 	char thePlayer = (char)player; 
 
 	//If this piece on the board is already taken by a player, don't change it!
-	if(this->board[row][column].getPlayer() != '0')
-	{cout << "Piece cannot be changed!" << endl;}
-
-	//Else, change the piece
-	else{this->board[row][column].changePlayer(thePlayer);}
+	if (board[row][column].getPlayer() != '0')
+    cout << "Piece cannot be changed!" << endl;
+  //Else, change the piece
+	else board[row][column].changePlayer(thePlayer);
 }
 
-void Board::checkWin(int rowStart, int columnStart, int winSize)
+void Board::checkWin()
 {
-
+  char check = board[cursor[0]][cursor[1]].getPlayer();
+  
+  /* ROWS */
+  for (int i = 0; i < boardSize; i++) {
+    if (win) break;
+    
+    for (int j = 0; j < boardSize; j++) {
+      if (board[i][j] == check) winCount++;
+      else winCount = 0;
+      
+      if (winCount == winSize) { win = true; break; }
+    }
+  }
+  
+  if (win) return true; // Do not continue
+  
+  /* COLUMNS */
+  for (int i = 0; i < boardSize; i++) {
+    if (win) break;
+    
+    for (int j = 0; j < boardSize; j++) {
+      if (board[j][i] == check) winCount++;
+      else winCount = 0;
+      
+      if (winCount == winSize) { win = true; break; }
+    }
+  }
+  
+  if (win) return true; // Do not continue
+  
+  /* LEFT SECTOR FORWARD DIAGONALS */
+  for (int s = 0; s < sectorSize; s++) {
+    if (win) break;
+    
+    /* Set new starting position */
+    if (lsf_count > 0) {
+      lsf_row = (boardSize - (numDiags - sectorSize)) + lsf_count;
+      lsf_col = 0;
+    }
+    
+    while (lsf_row >= 0) { // all lsf rows move to 0
+      if (board[lsf_row][lsf_col] == check) winCount++;
+      else winCount = 0;
+      
+      if (winCount == winSize) { win = true; break; }
+      
+      lsf_row--;
+      lsf_col++;
+    } lsf_count++;
+  }
+  
+  if (win) return true; // Do not continue
+  
+  /* MIDDLE FORWARD DIAGONAL */
+  while (mf_row >= 0) {
+    if (board[mf_row][mf_col] == check) winCount++;
+    else winCount = 0;
+    
+    if (winCount == winSize) { win = true; break; }
+    
+    mf_row--;
+    mf_col++;
+  }
+  
+  if (win) return true; // Do not continue
+  
+  /* RIGHT SECTOR FORWARD DIAGONALS */
+  for (int s = 0; s < sectorSize; s++) {
+    if (win) break;
+    
+    /* Set new starting position */
+    if (rsf_count > 0) {
+      rsf_row = boardSize - 1;
+      rsf_col = 1 + rsf_count;
+    }
+    
+    while (rsf_col < boardSize) { // all rsf columns move to n-1
+      if (board[rsf_row][rsf_col] == check) winCount++;
+      else winCount = 0;
+      
+      if (winCount == winSize) { win = true; break; }
+      
+      rsf_row--;
+      rsf_col++;
+    } rsf_count++;
+  }
+  
+  if (win) return true; // Do not continue
+  
+  /* LEFT SECTOR BACKWARD DIAGONALS */
+  for (int s = 0; s < sectorSize; s++) {
+    if (win) break;
+    
+    /* Set new starting position */
+    if (lsb_count > 0) {
+      lsb_row = (boardSize - winSize) - lsb_count;
+      lsb_col = 0;
+    }
+    
+    while (lsb_row < boardSize) { // all lsb rows move to n-1
+      if (board[lsb_row][lsb_col] == check) winCount++;
+      else winCount = 0;
+      
+      if (winCount == winSize) { win = true; break; }
+      
+      lsb_row++;
+      lsb_col++;
+    } lsb_count++;
+  }
+  
+  if (win) return true; // Do not continue
+  
+  /* MIDDLE BACKWARD DIAGONAL */
+  while (mb_row < boardSize) {
+    if (board[mb_row][mb_col] == check) winCount++;
+    else winCount = 0;
+    
+    if (winCount == winSize) { win = true; break; }
+    
+    mb_row++;
+    mb_col++;
+  }
+  
+  if (win) return true; // Do not continue
+  
+  /* RIGHT SECTOR BACKWARD DIAGONALS */
+  for (int s = 0; s < sectorSize; s++) {
+    if (win) break;
+    
+    /* Set new starting position */
+    if (rsb_count > 0) {
+      rsb_row = 0;
+      rsb_col = 1 + rsb_count;
+    }
+    
+    while (rsb_col < boardSize) { // all rsb columns move to n-1
+      if (board[rsb_row][rsb_col] == check) winCount++;
+      else winCount = 0;
+      
+      if (winCount == winSize) { win = true; break; }
+      
+      rsb_row++;
+      rsb_col++;
+    } rsb_count++;
+  }
+  
+  return win;
 }
 
 void Board::printBoard()
 {
-	/*This function, on the otherhand, is very simple. All that's neccessary is to print out the board by iterating
-	through the matrix. Keep checking whether a piece is the cursor, and if it is, print out cursorChar instead. */
+  for (int x = 0; x < boardSize; x++) {
+      for (int y = 0; y < boardSize; y++) {
+        if (board[x][y].cursor())
+          cout << '*' << endl;
+        else
+          cout << board[x][y].getPlayer();
+      }
+        cout << "\n";
+  }
 }
