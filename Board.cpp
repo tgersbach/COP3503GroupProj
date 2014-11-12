@@ -35,16 +35,7 @@ void Board::change(int row, int column, int player)
 
 void Board::checkWin(int rowStart, int columnStart, int winSize)
 {
-	/*This method is a bit tricky. Essentially, it needs to check each cardinal direction for exacly 5 pieces consecutively owned
-	by player who placed the piece at rowStart, columnStart. I believe the best format is as follows:
 
-	2    3   4				These are the 4 'routes' you can win in. Go through 1 through 4, one after another. 
-	  \  |  /				Use a while loop, end looping through the while loop once you hit a piece not owned by the owner of start. 
-	1-(start)-1				Keep in mind, the amount wins must be EXACTLY winSize. By default, winSize is 5. 
-      /  |  \
-	4	 3   2
-
-	*/
 }
 
 void Board::printBoard()
