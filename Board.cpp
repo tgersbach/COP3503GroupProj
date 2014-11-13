@@ -1,24 +1,23 @@
 #include "Board.h"
 
-Board::Board(int winSize)
+Board::Board()
 {
-	//Setting the cursor to the default position in the board
-	this->cursor[0] = 0; 
-	this->cursor[1] = 0; 
-
-	//Setting each piece on the board to a default piece 
-	for (int x = 0; x < boardSize; x++)
-	{
-		for (int y = 0; y < boardSize; y++)
-      { board[x][y] = new Piece(); }
-	}
+  // Setting the cursor to the default position in the board
+  cursor[0] = boardSize / 2;
+  cursor[1] = boardSize / 2;
   
+  // Setting each piece on the board to a default piece
+  for (int x = 0; x < boardSize; x++) {
+    for (int y = 0; y < boardSize; y++)
+      board[x][y] = new Piece();
+  }
+  
+  /* checkWin related */
   win = false;
-  this->winSize = winSize;
+  winSize = 5; // Default winSize
   winCount = 0;
   sectorSize = boardSize - winSize;
   numDiags = 2*sectorSize - 1;
-  
   lsf_row = boardSize - (numDiags - sectorSize);
   lsf_col = 0;
   mf_row = boardSize - 1;
@@ -31,24 +30,61 @@ Board::Board(int winSize)
   rsb_row = 0;
   rsb_col = 1;
   lsf_count = rsf_count = lsb_count = lsb_count = 0;
-
-	// The piece (zero, zero) on the board is the cursor
-	board[cursor[0]][cursor[1]].changeCursor(true);
-
-	// What the representation of the cursor is (to be used for later)
-	cursorChar = '*';
+  
+  // The starting position piece on the board is the cursor
+  board[cursor[0]][cursor[1]].setCursor();
+  
+  // What the representation of the cursor is (to be used for later)
+  cursorChar = '*';
 }
 
-void Board::change(int row, int column, int player)
+Board::Board(int winSize)
 {
-	//Convert the int value into a character
-	char thePlayer = (char)player; 
+  // Setting the cursor to the default position in the board
+  cursor[0] = boardSize / 2;
+  cursor[1] = boardSize / 2;
+  
+  // Setting each piece on the board to a default piece
+  for (int x = 0; x < boardSize; x++) {
+    for (int y = 0; y < boardSize; y++)
+      board[x][y] = new Piece();
+  }
+  
+  /* checkWin related */
+  win = false;
+  this->winSize = winSize;
+  winCount = 0;
+  sectorSize = boardSize - winSize;
+  numDiags = 2*sectorSize - 1;
+  lsf_row = boardSize - (numDiags - sectorSize);
+  lsf_col = 0;
+  mf_row = boardSize - 1;
+  mf_col = 0;
+  rsf_row = boardSize - 1;
+  rsf_col = 1;
+  lsb_row = boardSize - winSize;
+  lsb_col = 0;
+  mb_row = mb_col = 0;
+  rsb_row = 0;
+  rsb_col = 1;
+  lsf_count = rsf_count = lsb_count = lsb_count = 0;
+  
+  // The starting position piece on the board is the cursor
+  board[cursor[0]][cursor[1]].setCursor();
+  
+  // What the representation of the cursor is (to be used for later)
+  cursorChar = '*';
+}
 
-	//If this piece on the board is already taken by a player, don't change it!
-	if (board[row][column].getPlayer() != '0')
+
+void Board::changePiece(int player)
+{
+  char set; if (player == 1) set = '1'; else if (player == 2) set = '2'; else set = '0';
+
+	// If this piece on the board is already taken by a player, don't change it!
+	if (board[cursor[0]][cursor[1]].getPlayer() != '0')
     cout << "Piece cannot be changed!" << endl;
-  //Else, change the piece
-	else board[row][column].changePlayer(thePlayer);
+	else board[cursor[0]][cursor[1]].setPlayer(set);   // Else, change the piece
 }
 
 void Board::checkWin()
@@ -205,12 +241,11 @@ void Board::checkWin()
 void Board::printBoard()
 {
   for (int x = 0; x < boardSize; x++) {
-      for (int y = 0; y < boardSize; y++) {
-        if (board[x][y].cursor())
-          cout << '*' << endl;
-        else
-          cout << board[x][y].getPlayer();
-      }
-        cout << "\n";
+    for (int y = 0; y < boardSize; y++) {
+      if (board[x][y].isCursor())
+        cout << cursorChar << " ";
+      else
+        cout << board[x][y].getPlayer() << " ";
+    } cout << endl;
   }
 }
