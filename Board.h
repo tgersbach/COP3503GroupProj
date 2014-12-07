@@ -1,52 +1,44 @@
 #include <iostream>
-using namespace std; 
+using namespace std;
 
 class Piece
 {
-  private:
-    // Each 'piece' on the board has two components, which player it belongs to,
-    // and if that position is where the cursor is.
-    char player;
-    bool cursor;
+private:
+	//Each 'piece' on the board has two components, which player it belongs to
+	//(0 = no player, 1 = main player, 2 = second player/AI), and if that position
+	//is where the cursor is.
+	char player;
+	bool isCursor;
 
-  public:
-    Piece() { player = '0'; cursor = false; }
-    Piece(char player) { this->player = player; cursor = false; }
+public:
+	//Constructors
+	Piece(){this->player = '0'; this->isCursor = false;};
+	Piece(char playerType){this->player = playerType; this->isCursor = false;};
 
-    // Standard get and mutator methods
-    virtual char getPlayer() { return player; }
-    virtual void setPlayer(char player) { this->player = player; }
-    virtual void setCursor() { cursor = true; }
-    virtual bool isCursor() { return cursor; }
+	//Standard get and mutator methods
+	virtual char getPlayer(){return this->player;};
+	virtual void changePlayer(char newPlayer){this->player = newPlayer;};
+	virtual bool cursor(){return isCursor;};
+	virtual void changeCursor(bool arg){this->isCursor = arg;};
 };
 
 class Board
 {
-  private:
-    static const int boardSize = 19;
-    Piece board[boardSize][boardSize];
-    int cursor[2];
-    char cursorChar;
-  
-    /* checkWin related */
-    bool win;
-    int winSize, winCount, sectorSize, numDiags;
-  
-    int lsf_row, lsf_col; // Start positions for diagonals
-    int mf_row, mf_col;
-    int rsf_row, rsf_col;
-    int lsb_row, lsb_col;
-    int mb_row, mb_col;
-    int rsb_row, rsb_col;
-  
-    int lsf_count, rsf_count, lsb_count, rsb_count; // Counters for diagonals
+private:
 
-  public:
-    Board();
-    Board(int winSize);
-    ~Board();
+	int cursor[2];
+	int boardSize;
+	Piece board[19][19];
+	char cursorChar;
 
-    virtual void changePiece(int row, int column, int player);
-    virtual void checkWin();
-    virtual void printBoard(); 
+public:
+	Board(int size);
+	//~Board();
+
+	virtual bool change(int row, int column, char player);
+	virtual void changeCur(int row, int column);
+	virtual bool checkWin(int rowStart, int columnStart, int winSize);
+	virtual void printBoard();
 };
+
+

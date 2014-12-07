@@ -1,251 +1,187 @@
 #include "Board.h"
+//#define "Board.h" 
 
-Board::Board()
+Board::Board(int boardSize)
 {
-  // Setting the cursor to the default position in the board
-  cursor[0] = boardSize / 2;
-  cursor[1] = boardSize / 2;
-  
-  // Setting each piece on the board to a default piece
-  for (int x = 0; x < boardSize; x++) {
-    for (int y = 0; y < boardSize; y++)
-      board[x][y] = new Piece();
-  }
-  
-  /* checkWin related */
-  win = false;
-  winSize = 5; // Default winSize
-  winCount = 0;
-  sectorSize = boardSize - winSize;
-  numDiags = 2*sectorSize - 1;
-  lsf_row = boardSize - (numDiags - sectorSize);
-  lsf_col = 0;
-  mf_row = boardSize - 1;
-  mf_col = 0;
-  rsf_row = boardSize - 1;
-  rsf_col = 1;
-  lsb_row = boardSize - winSize;
-  lsb_col = 0;
-  mb_row = mb_col = 0;
-  rsb_row = 0;
-  rsb_col = 1;
-  lsf_count = rsf_count = lsb_count = lsb_count = 0;
-  
-  // The starting position piece on the board is the cursor
-  board[cursor[0]][cursor[1]].setCursor();
-  
-  // What the representation of the cursor is (to be used for later)
-  cursorChar = '*';
+	boardSize = 19; 
+	//Setting the cursor to the default position in the board
+	this->cursor[0] = 0; 
+	this->cursor[1] = 0; 
+
+	//Setting each piece on the board to a default piece 
+	for(int x = 0; x < this->boardSize; x++)
+	{
+		for(int y = 0; y < this->boardSize; y++)
+		{this->board[x][y] = Piece(); }
+	}
+
+	//The piece (zero, zero) on the board is the cursor
+	this->board[cursor[0]][cursor[1]].changeCursor(true); 
+
+	//What the representation of the cursor is (to be used for later)
+	this->cursorChar = '*'; 
 }
 
-Board::Board(int winSize)
+bool Board::change(int row, int column, char player)
 {
-  // Setting the cursor to the default position in the board
-  cursor[0] = boardSize / 2;
-  cursor[1] = boardSize / 2;
-  
-  // Setting each piece on the board to a default piece
-  for (int x = 0; x < boardSize; x++) {
-    for (int y = 0; y < boardSize; y++)
-      board[x][y] = new Piece();
-  }
-  
-  /* checkWin related */
-  win = false;
-  this->winSize = winSize;
-  winCount = 0;
-  sectorSize = boardSize - winSize;
-  numDiags = 2*sectorSize - 1;
-  lsf_row = boardSize - (numDiags - sectorSize);
-  lsf_col = 0;
-  mf_row = boardSize - 1;
-  mf_col = 0;
-  rsf_row = boardSize - 1;
-  rsf_col = 1;
-  lsb_row = boardSize - winSize;
-  lsb_col = 0;
-  mb_row = mb_col = 0;
-  rsb_row = 0;
-  rsb_col = 1;
-  lsf_count = rsf_count = lsb_count = lsb_count = 0;
-  
-  // The starting position piece on the board is the cursor
-  board[cursor[0]][cursor[1]].setCursor();
-  
-  // What the representation of the cursor is (to be used for later)
-  cursorChar = '*';
+	//Convert the int value into a character
+	char Player = player; 
+
+	//If this piece on the board is already taken by a player, don't change it!
+	if(this->board[row][column].getPlayer() != '0')
+	{cout << "Piece cannot be changed!" << endl; return false;}
+
+	//Else, change the piece
+	else{this->board[row][column].changePlayer(Player); return true;}
 }
 
-
-void Board::changePiece(int player)
+void Board::changeCur(int row, int column)
 {
-  char set; if (player == 1) set = '1'; else if (player == 2) set = '2'; else set = '0';
-
-	// If this piece on the board is already taken by a player, don't change it!
-	if (board[cursor[0]][cursor[1]].getPlayer() != '0')
-    cout << "Piece cannot be changed!" << endl;
-	else board[cursor[0]][cursor[1]].setPlayer(set);   // Else, change the piece
+	if(this->board[row][column].cursor()){this->board[row][column].changeCursor(false);}
+	else{this->board[row][column].changeCursor(true); this->cursor[0] = row; this->cursor[1] = column;} 
 }
 
-void Board::checkWin()
+bool Board::checkWin(int columnStart, int rowStart, int winSize)
 {
-  char check = board[cursor[0]][cursor[1]].getPlayer();
-  
-  /* ROWS */
-  for (int i = 0; i < boardSize; i++) {
-    if (win) break;
-    
-    for (int j = 0; j < boardSize; j++) {
-      if (board[i][j] == check) winCount++;
-      else winCount = 0;
-      
-      if (winCount == winSize) { win = true; break; }
-    }
-  }
-  
-  if (win) return true; // Do not continue
-  
-  /* COLUMNS */
-  for (int i = 0; i < boardSize; i++) {
-    if (win) break;
-    
-    for (int j = 0; j < boardSize; j++) {
-      if (board[j][i] == check) winCount++;
-      else winCount = 0;
-      
-      if (winCount == winSize) { win = true; break; }
-    }
-  }
-  
-  if (win) return true; // Do not continue
-  
-  /* LEFT SECTOR FORWARD DIAGONALS */
-  for (int s = 0; s < sectorSize; s++) {
-    if (win) break;
-    
-    /* Set new starting position */
-    if (lsf_count > 0) {
-      lsf_row = (boardSize - (numDiags - sectorSize)) + lsf_count;
-      lsf_col = 0;
-    }
-    
-    while (lsf_row >= 0) { // all lsf rows move to 0
-      if (board[lsf_row][lsf_col] == check) winCount++;
-      else winCount = 0;
-      
-      if (winCount == winSize) { win = true; break; }
-      
-      lsf_row--;
-      lsf_col++;
-    } lsf_count++;
-  }
-  
-  if (win) return true; // Do not continue
-  
-  /* MIDDLE FORWARD DIAGONAL */
-  while (mf_row >= 0) {
-    if (board[mf_row][mf_col] == check) winCount++;
-    else winCount = 0;
-    
-    if (winCount == winSize) { win = true; break; }
-    
-    mf_row--;
-    mf_col++;
-  }
-  
-  if (win) return true; // Do not continue
-  
-  /* RIGHT SECTOR FORWARD DIAGONALS */
-  for (int s = 0; s < sectorSize; s++) {
-    if (win) break;
-    
-    /* Set new starting position */
-    if (rsf_count > 0) {
-      rsf_row = boardSize - 1;
-      rsf_col = 1 + rsf_count;
-    }
-    
-    while (rsf_col < boardSize) { // all rsf columns move to n-1
-      if (board[rsf_row][rsf_col] == check) winCount++;
-      else winCount = 0;
-      
-      if (winCount == winSize) { win = true; break; }
-      
-      rsf_row--;
-      rsf_col++;
-    } rsf_count++;
-  }
-  
-  if (win) return true; // Do not continue
-  
-  /* LEFT SECTOR BACKWARD DIAGONALS */
-  for (int s = 0; s < sectorSize; s++) {
-    if (win) break;
-    
-    /* Set new starting position */
-    if (lsb_count > 0) {
-      lsb_row = (boardSize - winSize) - lsb_count;
-      lsb_col = 0;
-    }
-    
-    while (lsb_row < boardSize) { // all lsb rows move to n-1
-      if (board[lsb_row][lsb_col] == check) winCount++;
-      else winCount = 0;
-      
-      if (winCount == winSize) { win = true; break; }
-      
-      lsb_row++;
-      lsb_col++;
-    } lsb_count++;
-  }
-  
-  if (win) return true; // Do not continue
-  
-  /* MIDDLE BACKWARD DIAGONAL */
-  while (mb_row < boardSize) {
-    if (board[mb_row][mb_col] == check) winCount++;
-    else winCount = 0;
-    
-    if (winCount == winSize) { win = true; break; }
-    
-    mb_row++;
-    mb_col++;
-  }
-  
-  if (win) return true; // Do not continue
-  
-  /* RIGHT SECTOR BACKWARD DIAGONALS */
-  for (int s = 0; s < sectorSize; s++) {
-    if (win) break;
-    
-    /* Set new starting position */
-    if (rsb_count > 0) {
-      rsb_row = 0;
-      rsb_col = 1 + rsb_count;
-    }
-    
-    while (rsb_col < boardSize) { // all rsb columns move to n-1
-      if (board[rsb_row][rsb_col] == check) winCount++;
-      else winCount = 0;
-      
-      if (winCount == winSize) { win = true; break; }
-      
-      rsb_row++;
-      rsb_col++;
-    } rsb_count++;
-  }
-  
-  return win;
+	/*This method is a bit tricky. Essentially, it needs to check each cardinal direction for exacly 5 pieces consecutively owned
+	by player who placed the piece at rowStart, columnStart. I believe the best format is as follows:
+
+	2    3   4				These are the 4 'routes' you can win in. Go through 1 through 4, one after another. 
+	  \  |  /				Use a while loop, end looping through the while loop once you hit a piece not owned by the owner of start. 
+	1-(start)-1				Keep in mind, the amount wins must be EXACTLY winSize. By default, winSize is 5. 
+      /  |  \
+	4	 3   2
+
+	*/
+
+	bool done = false; 
+	char thePlayer = this->board[columnStart][rowStart].getPlayer(); 
+
+	while(!done)
+	{
+		//Travels west and east 
+		int west = columnStart; 
+		int east = columnStart + 1; 
+		int winCount = 0; 
+		while(this->board[west][rowStart].getPlayer() == thePlayer)
+		{
+			winCount++; 
+			if((west - 1) >= 0){west--;} 
+			else{break;}
+		}
+
+		if(winCount == winSize){return true;}
+
+		if(east < 19){
+		while(this->board[east][rowStart].getPlayer() == thePlayer)
+		{
+			winCount++; 
+			if((east + 1) < this->boardSize){east++;} 
+			else{break;}
+		}}
+	
+		if(winCount == winSize){return true;}
+
+		//Travels NorthWest and SouthEast
+		winCount = 0; 
+		int NWcolumn = columnStart; 
+		int NWrow = rowStart; 
+		int SEcolumn = columnStart + 1;
+		int SErow = rowStart + 1; 
+		while(this->board[NWcolumn][NWrow].getPlayer() == thePlayer)
+		{
+			winCount++; 
+			if((NWcolumn - 1) >= 0){NWcolumn--;} 
+			else{break;}
+			if((NWrow - 1) >= 0){NWrow--;}
+			else{break;}
+		}
+
+		if(winCount == winSize){return true;}
+
+		if((SEcolumn < 19) && (SErow < 19)){
+		while(this->board[SEcolumn][SErow].getPlayer() == thePlayer)
+		{
+			winCount++; 
+			if((SEcolumn + 1) < this->boardSize){SEcolumn++;} 
+			else{break;}
+			if((SErow + 1) < this->boardSize){SErow++;}
+			else{break;}
+		}}
+
+		if(winCount == winSize){return true;}
+
+		//Travels north and south
+		int north = rowStart; 
+		int south = rowStart + 1; 
+		winCount = 0; 
+		while(this->board[columnStart][north].getPlayer() == thePlayer)
+		{
+			winCount++; 
+			if((north - 1) >= 0){north--;} 
+			else{break;}
+		}
+
+		if(winCount == winSize){return true;}
+
+		if(south < 19){
+		while(this->board[columnStart][south].getPlayer() == thePlayer)
+		{
+			winCount++; 
+			if((south + 1) < this->boardSize){south++;} 
+			else{break;}
+		}}
+	
+		if(winCount == winSize){return true;}
+
+		//Travels north-east and south-west
+		winCount = 0; 
+		int NEcolumn = columnStart; 
+		int NErow = rowStart; 
+		int SWcolumn = columnStart - 1;
+		int SWrow = rowStart + 1; 
+		while(this->board[NEcolumn][NErow].getPlayer() == thePlayer)
+		{
+			winCount++; 
+			if((NEcolumn + 1) < this->boardSize){NEcolumn++;} 
+			else{break;}
+			if((NErow - 1) >= 0){NErow--;}
+			else{break;}
+		}
+
+		if(winCount == winSize){done = true; return true;}
+
+		if((SWcolumn > -1) && (SWrow < 19)){
+		while(this->board[SWcolumn][SWrow].getPlayer() == thePlayer)
+		{
+			winCount++; 
+			if((SWcolumn - 1) >= 0){SWcolumn--;} 
+			else{break;}
+			if((SWrow + 1) < this->boardSize){SWrow++;}
+			else{break;}
+		}}
+
+		if(winCount == winSize){return true;}
+
+		return false; 
+	}
+	return false; 
 }
 
 void Board::printBoard()
 {
-  for (int x = 0; x < boardSize; x++) {
-    for (int y = 0; y < boardSize; y++) {
-      if (board[x][y].isCursor())
-        cout << cursorChar << " ";
-      else
-        cout << board[x][y].getPlayer() << " ";
-    } cout << endl;
-  }
+	/*This function, on the otherhand, is very simple. All that's neccessary is to print out the board by iterating
+	through the matrix. Keep checking whether a piece is the cursor, and if it is, print out cursorChar instead. */
+	this->boardSize = 19; 
+	 for (int y = 0; y < boardSize; y++) 
+	 {
+	    for (int x = 0; x < boardSize; x++)
+		{
+	      if (board[x][y].cursor())
+		  {cout << cursorChar << " ";}
+	      else
+		  {cout << board[x][y].getPlayer() << " ";}
+	    } 
+		cout << endl;
+	  }
 }
