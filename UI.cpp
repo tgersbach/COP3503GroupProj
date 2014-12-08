@@ -22,17 +22,17 @@ void UI::run()
 		cout<<"GOMOKU"<<endl;
 		cout<<"Choose one."<<endl;
 		cout<<"1: Play a local game (two players)"<<endl;
-		//cout<<"2: Change settings"<<endl;
-		cout<<"2: Exit"<<endl;
+		cout<<"2: Change settings"<<endl;
+		cout<<"3: Exit"<<endl;
 
 		int choice;
 		cin >>choice;
 
 		if(choice == 1)
 		{this->playGameTwoPlayer();}
-		//if(choice == 2)
-		//{this->changeSettings();}
 		if(choice == 2)
+		{this->changeSettings();}
+		if(choice == 3)
 		{done = true;}
 	}
 }
@@ -48,90 +48,132 @@ void UI::playGameTwoPlayer()
     bool two = false;
 
 	while(one == false && two == false){
-        do{
+        
+			system("CLS"); 
             cout << "Player 1 turn: " << endl;
 			basicBoard.printBoard(); 
-            cout << "Choose a direction by using the 'wasd' keypad and hitting enter." << endl;
-			cout << "If you've decided on your move, hit 1 and hit enter." << endl; 
-            cin >> i;
-            if(i == 'w' && y != 0){
-				basicBoard.changeCur(x, y);
-                y = y-1;
-				basicBoard.changeCur(x, y);
-                basicBoard.printBoard();
-            }
-            else if(i == 'a' && x!=0){
-				basicBoard.changeCur(x, y);
-                x = x-1;
-				basicBoard.changeCur(x, y);
-                basicBoard.printBoard();
-            }
-            else if(i == 's' && y!=19){
-				basicBoard.changeCur(x, y);
-                y = y+1;
-				basicBoard.changeCur(x, y);
-                basicBoard.printBoard();
-            }
-            else if(i == 'd' && x!=19){
-				basicBoard.changeCur(x, y);
-                x = x+1;
-				basicBoard.changeCur(x, y);
-                basicBoard.printBoard();
-            }
-            else if(i == '1'){
-				bool check = basicBoard.change(x, y, '1');
-				if(check){one = basicBoard.checkWin(x, y, winSize);}
-				else{i = '0';}
-            }
-        }while(i != '1'); 
+            cout << "Choose a direction by using the 'wasd'." << endl;
+			cout << "Select your move by hitting enter." << endl; 
+            i = 0;  
+		do{	if(kbhit()) 
+			{ 
+				i = getch(); 
+				if(i == 'w' && y != 0){
+					basicBoard.changeCur(x, y);
+					y = y-1;
+					basicBoard.changeCur(x, y);
+					system("CLS"); 
+					cout << "Player 1 turn: " << endl;
+					basicBoard.printBoard(); 
+					cout << "Choose a direction by using the 'wasd'." << endl;
+					cout << "Select your move by hitting enter." << endl; 
+				}
+				else if(i == 'a' && x!=0){
+					basicBoard.changeCur(x, y);
+					x = x-1;
+					basicBoard.changeCur(x, y);
+					system("CLS"); 
+					cout << "Player 1 turn: " << endl;
+					basicBoard.printBoard(); 
+					cout << "Choose a direction by using the 'wasd'." << endl;
+					cout << "Select your move by hitting enter." << endl; 
+				}
+				else if(i == 's' && y!=18){
+					basicBoard.changeCur(x, y);
+					y = y+1;
+					basicBoard.changeCur(x, y);
+					system("CLS"); 
+					cout << "Player 1 turn: " << endl;
+					basicBoard.printBoard(); 
+					cout << "Choose a direction by using the 'wasd'." << endl;
+					cout << "Select your move by hitting enter." << endl; 
+				}
+				else if(i == 'd' && x!=18){
+					basicBoard.changeCur(x, y);
+					x = x+1;
+					basicBoard.changeCur(x, y);
+					system("CLS"); 
+					cout << "Player 1 turn: " << endl;
+					basicBoard.printBoard(); 
+					cout << "Choose a direction by using the 'wasd'." << endl;
+					cout << "Select your move by hitting enter." << endl; 
+
+				}
+				else if(i == char(13)){
+					bool check = basicBoard.change(x, y, '1');
+					if(check){one = basicBoard.checkWin(x, y, winSize);}
+					else{i = '0';}
+			}}
+        }while(i != char(13)); 
 
 		if(one == true)
 		{
-			 cout << "Player 1 wins!" << endl; return; 
+			system("CLS"); 
+			cout << "Player 1 wins!" << endl; return; 
 		}
 
-        do{
+ 			system("CLS"); 
             cout << "Player 2 turn: " << endl;
 			basicBoard.printBoard(); 
-            cout << "Choose a direction by using the 'wasd' keypad and hitting enter." << endl;
-			cout << "If you've decided on your move, hit 2 and enter." << endl; 
-            cin >> i;
-            if(i == 'w' && y != 0){
-				basicBoard.changeCur(x, y);
-                y = y-1;
-				basicBoard.changeCur(x, y);
-                basicBoard.printBoard();
-            }
-            else if(i == 'a' && x!=0){
-				basicBoard.changeCur(x, y);
-                x = x-1;
-				basicBoard.changeCur(x, y);
-                basicBoard.printBoard();
-            }
-            else if(i == 's' && y!=19){
-				basicBoard.changeCur(x, y);
-                y = y+1;
-				basicBoard.changeCur(x, y);
-                basicBoard.printBoard();
-            }
-            else if(i == 'd' && x!=19){
-				basicBoard.changeCur(x, y);
-                x = x+1;
-				basicBoard.changeCur(x, y);
-                basicBoard.printBoard();
-            }
-            else if(i == '2'){
-				bool check = basicBoard.change(x, y, '2');
-				if(check){one = basicBoard.checkWin(x, y, winSize);}
-				else{i = '0';}
-            }
-        }while(i != '2'); 
-	}
+            cout << "Choose a direction by using the 'wasd'." << endl;
+			cout << "Select your move by hitting enter." << endl; 
+			i = 0;  
+		do{	if(kbhit()) 
+			{
+				i = getch(); 
+				if(i == 'w' && y != 0){
+					basicBoard.changeCur(x, y);
+					y = y-1;
+					basicBoard.changeCur(x, y);
+					system("CLS"); 
+					cout << "Player 2 turn: " << endl;
+					basicBoard.printBoard(); 
+					cout << "Choose a direction by using the 'wasd'." << endl;
+					cout << "Select your move by hitting enter." << endl; 
+				}
+				else if(i == 'a' && x!=0){
+					basicBoard.changeCur(x, y);
+					x = x-1;
+					basicBoard.changeCur(x, y);
+					system("CLS"); 
+					cout << "Player 2 turn: " << endl;
+					basicBoard.printBoard(); 
+					cout << "Choose a direction by using the 'wasd'." << endl;
+					cout << "Select your move by hitting enter." << endl; 
+				}
+				else if(i == 's' && y!=18){
+					basicBoard.changeCur(x, y);
+					y = y+1;
+					basicBoard.changeCur(x, y);
+					system("CLS"); 
+					cout << "Player 2 turn: " << endl;
+					basicBoard.printBoard(); 
+					cout << "Choose a direction by using the 'wasd'." << endl;
+					cout << "Select your move by hitting enter." << endl; 
+				}
+				else if(i == 'd' && x!=18){
+					basicBoard.changeCur(x, y);
+					x = x+1;
+					basicBoard.changeCur(x, y);
+					system("CLS"); 
+					cout << "Player 2 turn: " << endl;
+					basicBoard.printBoard(); 
+					cout << "Choose a direction by using the 'wasd'." << endl;
+					cout << "Select your move by hitting enter." << endl; 
+
+				}
+				else if(i == char(13)){
+					bool check = basicBoard.change(x, y, '2');
+					if(check){two = basicBoard.checkWin(x, y, winSize);}
+					else{i = '0';}
+			}}
+        }while(i != char(13)); 
 
     if(two == true)
 	{
+		system("CLS"); 
         cout << "Player 2 wins!" << endl; return; 
-    }
+	}}
 
 }
 

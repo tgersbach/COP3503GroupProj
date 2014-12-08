@@ -45,13 +45,11 @@ bool Board::checkWin(int columnStart, int rowStart, int winSize)
 {
 	/*This method is a bit tricky. Essentially, it needs to check each cardinal direction for exacly 5 pieces consecutively owned
 	by player who placed the piece at rowStart, columnStart. I believe the best format is as follows:
-
 	2    3   4				These are the 4 'routes' you can win in. Go through 1 through 4, one after another. 
 	  \  |  /				Use a while loop, end looping through the while loop once you hit a piece not owned by the owner of start. 
 	1-(start)-1				Keep in mind, the amount wins must be EXACTLY winSize. By default, winSize is 5. 
       /  |  \
 	4	 3   2
-
 	*/
 
 	bool done = false; 
@@ -173,12 +171,23 @@ void Board::printBoard()
 	/*This function, on the otherhand, is very simple. All that's neccessary is to print out the board by iterating
 	through the matrix. Keep checking whether a piece is the cursor, and if it is, print out cursorChar instead. */
 	this->boardSize = 19; 
+	void setcolor(int color); 
 	 for (int y = 0; y < boardSize; y++) 
 	 {
 	    for (int x = 0; x < boardSize; x++)
 		{
 	      if (board[x][y].cursor())
 		  {cout << cursorChar << " ";}
+
+		/* else if (board[x][y].getPlayer() == '1' ) {
+            setcolor(GREEN);
+            cprintf("1");
+          }
+        
+        else if (board[x][y].getPlayer() == '2') {
+            setcolor(BLUE);
+            cprintf("2");
+          }*/
 	      else
 		  {cout << board[x][y].getPlayer() << " ";}
 	    } 
