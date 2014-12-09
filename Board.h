@@ -1,3 +1,5 @@
+//PROJ 3 Board.h
+//By Alexis Benter, Elana Bobelis, Patric Bradley, Tyler Gersbach, and Ryan Lieblein
 #include <iostream>
 #include <conio.h>
 #include <stdio.h>
@@ -29,19 +31,19 @@ class Board
 {
 private:
 
-	int cursor[2];
-	int boardSize;
-	Piece board[19][19];
-	char cursorChar;
+	int cursor[2];	//Where the cursor is
+	int boardSize;	//What size the board is
+	Piece board[19][19];//The default board
+	char cursorChar;	//What this board's cursor is
 
 public:
-	Board(int size);
-	//~Board();
-
-	virtual bool change(int row, int column, char player);
-	virtual void changeCur(int row, int column);
-	virtual bool checkWin(int rowStart, int columnStart, int winSize);
-	virtual void printBoard();
+	Board(int size); //Constructor
+   
+	virtual bool change(int row, int column, char player);	//Change a pieces value
+	virtual void changeCur(int row, int column);			//Change the cursor's position
+	virtual bool checkWin(int rowStart, int columnStart, int winSize);	//Check is a piece is a winning one
+	virtual void printBoard();								//Print out the board to console
+	virtual void changeCurChar(char theCur){this->cursorChar = theCur;};	//Change the character that is used for the cursor
 };
 
 

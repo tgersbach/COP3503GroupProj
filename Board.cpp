@@ -1,5 +1,6 @@
-#include "Board.h"
-//#define "Board.h" 
+//PROJ 3 Board.cpp
+//By Alexis Benter, Elana Bobelis, Patric Bradley, Tyler Gersbach, and Ryan Lieblein
+#include "Board.h" 
 
 Board::Board(int boardSize)
 {
@@ -178,16 +179,6 @@ void Board::printBoard()
 		{
 	      if (board[x][y].cursor())
 		  {cout << cursorChar << " ";}
-
-		/* else if (board[x][y].getPlayer() == '1' ) {
-            setcolor(GREEN);
-            cprintf("1");
-          }
-        
-        else if (board[x][y].getPlayer() == '2') {
-            setcolor(BLUE);
-            cprintf("2");
-          }*/
 	      else
 		  {cout << board[x][y].getPlayer() << " ";}
 	    } 
